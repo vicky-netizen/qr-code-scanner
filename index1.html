@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SCANNER APP</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #title {
+            font-size: 2em;
+            margin-top: 20px;
+            color: #fff;
+        }
+        #reader {
+            width: 500px;
+            height: 375px;
+            margin: 20px auto;
+            border: 5px solid #fff;
+            border-radius: 0%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        #references {
+            margin-top: 20px;
+            font-size: 1em;
+            color: #000000;
+            width: 96%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #references ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #references li {
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #references a {
+            color: #000000;
+            text-decoration: none;
+        }
+        #references h3 {
+            margin: 0;
+        }
+        .reference-button {
+            background-color: #fff;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        #history {
+            margin-top: 20px;
+            font-size: 1em;
+            color: #000000;
+            width: 96%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        #history li {
+            margin: 5px 0;
+        }
+        #history a {
+            color: #000000;
+            text-decoration: none;
+        }
+        #capture-photo-button {
+            margin-top: 20px;
+            background-color: #fff;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <script src="./qrScript.js"></script>
+    <div>
+        <div id="title">QR CODE SCANNER</div>
+        <div id="reader"></div>
+        <canvas id="capture-canvas" style="display:none;"></canvas>
+        <button id="capture-photo-button">Capture and Download Photo</button>
+        <div id="references">
+            <h3><bold>References Used</bold></h3>
+            <ul>
+                <li>
+                    Research Gate
+                    <button class="reference-button" onclick="window.open('https://www.researchgate.net/search/publication?q=qr+code+scanner', '_blank')">Go</button>
+                </li>
+                <li>
+                    html5-qrcode
+                    <button class="reference-button" onclick="window.open('https://unpkg.com/html5-qrcode', '_blank')">Go</button>
+                </li>
+                <li>
+                    Coding Lab
+                    <button class="reference-button" onclick="window.open('https://chatgpt.com/?model=auto', '_blank')">Go</button>
+                </li>
+                <li>
+                    photo downloading idea
+                    <button class="reference-button" onclick="window.open('https://github.com/Praveenjha802/capture-and-save-image-through-html-css-and-javascript/blob/master/image_capture.html', '_blank')">Go</button>
+                </li>
+            </ul>
+        </div>
+        <div id="history">
+            <h3><bold>Scanned Links History</bold></h3>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+    <script>
+        const html5Qrcode = new Html5Qrcode('reader');
+        const historyList = document.getElementById('history-list');
+        const capturePhotoButton = document.getElementById('capture-photo-button');
+        const captureCanvas = document.getElementById('capture-canvas');
+        const context = captureCanvas.getContext('2d');
+        
+        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+            if (decodedText) {
+                const historyItem = document.createElement('li');
+                const historyLink = document.createElement('a');
+                historyLink.href = decodedText;
+                historyLink.target = '_blank';
+                historyLink.innerText = decodedText;
+                historyItem.appendChild(historyLink);
+                historyList.appendChild(historyItem);
+
+                window.open(decodedText, '_blank');
+               
+                html5Qrcode.stop().then(() => {
+                    
+                    setTimeout(() => {
+                        html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+                    }, 2000); 
+                }).catch(err => {
+                    console.error("Failed to stop the scanner: ", err);
+                });
+            }
+        }
+        
+        const config = { fps: 10, qrbox: { width: 300, height: 300 } };
+        html5Qrcode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+
+        capturePhotoButton.addEventListener('click', () => {
+            const videoElement = document.querySelector('video');
+            captureCanvas.width = videoElement.videoWidth;
+            captureCanvas.height = videoElement.videoHeight;
+            context.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
+
+            const dataUrl = captureCanvas.toDataURL('image/png');
+            
+            const a = document.createElement('a'); 
+            a.href = dataUrl;
+            a.download = 'captured-image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>

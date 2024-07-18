@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Captured Photo</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        #download-button {
+            margin-top: 20px;
+            background-color: #fff;
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #captured-image {
+            max-width: 60%;
+            height: auto;
+            border: 5px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <img id="captured-image" alt="Captured Photo" />
+    <button id="download-button">Download Photo</button>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const dataUrl = params.get('dataUrl');
+        const img = document.getElementById('captured-image');
+        const downloadButton = document.getElementById('download-button');
+
+        img.src = dataUrl;
+
+        downloadButton.addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = 'captured-image.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>
